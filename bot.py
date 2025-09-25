@@ -7,7 +7,7 @@ from datetime import datetime
 VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json"
 CHANNEL_ID = 1420399607661465673  # Replace with your channel ID
 
-WATCHED_POSITIONS = ["ORBI_TWR", "OLBA_TWR", "ORSU_TWR"]
+WATCHED_POSITIONS = ["ORBI_TWR", "ORBI_GND", "ORBI_DEL", "ORBI_APP", "ORBI_DEP", "ORBB_N_CTR", "ORBB_CTR", "ORBB_1_CTR", "ORBB_2_CTR", "ORBB_S_CTR", "ORBB_U_CTR", "ORBB_V_CTR", "ORNI_GND", "ORNI_TWR", "ORMM_GND", "ORMM_TWR", "OREZ_TWR", "ORER_TWR", "ORKK_GND", "ORKK_TWR", "ORBM_TWR", "ORAA_TWR", "OSDI_DEL", "OSDI_GND", "OSDI_TWR", "OSDI_APP", "OSDI_DEP", "OSDI_CTR", "OSAP_GND", "OSAP_TWR", "OSAP_APP", "OLBA_DEL", "OLBA_GND", "OLBA_APP", "OLBA_CTR", "ORBI_FMP", "OLBA_FMP", "OLBA_TWR", "ORSU_TWR"]
 
 intents = discord.Intents.default()
 
