@@ -67,3 +67,62 @@ class MyClient(discord.Client):
                         embed.add_field(name="Callsign", value=callsign, inline=True)
                         embed.add_field(name="Frequency", value=freq, inline=True)
                         embed.add_field(name="Controller",
+                                        value=f"{pilot_name} is online at {timestamp}",
+                                        inline=False)
+                        embed.set_thumbnail(url="attachment://thumbnail.png")
+                        embed.set_footer(text="Levant vACC Operations")
+
+                        await channel.send(file=file, embed=embed)
+
+                    # -----------------------------
+                    # ATC went offline
+                    # -----------------------------
+                    for callsign in previous_callsigns - current_callsigns:
+                        info = self.previous_atc[callsign]
+                        pilot_name = info.get("name", "Unknown")
+                        timestamp = datetime.utcnow().strftime("%H:%M UTC")
+
+                        file = discord.File("thumbnail.png", filename="thumbnail.png")
+                        embed = discord.Embed(
+                            title=f"{callsign} Disconnected",
+                            color=0xff0000
+                        )
+                        embed.add_field(name="Controller",
+                                        value=f"{pilot_name} is now offline",
+                                        inline=False)
+                        embed.add_field(name="End Time", value=timestamp, inline=True)
+                        embed.set_thumbnail(url="attachment://thumbnail.png")
+                        embed.set_footer(text="Levant vACC Operations")
+                        await channel.send(file=file, embed=embed)
+
+                    # -----------------------------
+                    # Update previous_atc
+                    # -----------------------------
+                    self.previous_atc = {callsign: current_atc[callsign] for callsign in current_callsigns}
+
+            except Exception as e:
+                print(f"Error: {e}")
+
+            await asyncio.sleep(60)
+
+# -----------------------------
+# Flask Keep-Alive Server
+# -----------------------------
+app = Flask("")
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
+threading.Thread(target=run_flask).start()
+
+# -----------------------------
+# Run Discord Bot
+# -----------------------------
+token = os.environ.get("DISCORD_TOKEN")
+client = MyClient(intents=intents)
+client.run(token)
