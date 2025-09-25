@@ -43,6 +43,7 @@ class MyClient(discord.Client):
                             freq = info.get("frequency", "N/A")
                             file = discord.File("logo.png", filename="logo.png")
                             timestamp = datetime.utcnow().strftime("%H:%Mz")
+                            file = discord.File("thumbnail.png", filename="thumbnail.png")
 
                             embed = discord.Embed(
                                 title=f"{callsign} is Online",
@@ -51,7 +52,7 @@ class MyClient(discord.Client):
                             embed.add_field(name="Callsign", value=callsign, inline=True)
                             embed.add_field(name="Frequency", value=freq, inline=True)
                             embed.add_field(name="Controller", value=f"{pilot_name} is online at {timestamp}", inline=False)
-                            embed.set_image(url="attachment://logo.png")
+                            embed.set_thumbnail(url="attachment://thumbnail.png")
                             embed.set_footer(text="Levant vACC Operations")
 
                             await channel.send(file=file, embed=embed)
@@ -64,7 +65,7 @@ class MyClient(discord.Client):
                             online_time = info.get("timestamp")
                             end_time = datetime.utcnow()
                             duration = end_time - online_time
-                            file = discord.File("logo.png", filename="logo.png")
+                            file = discord.File("thumbnail.png", filename="thumbnail.png")
 
                             embed = discord.Embed(
                                 title=f"{callsign} Disconnected",
@@ -73,7 +74,7 @@ class MyClient(discord.Client):
                             embed.add_field(name="Controller", value=f"{pilot_name} is now offline", inline=False)
                             embed.add_field(name="End Time", value=end_time.strftime("%H:%Mz"), inline=True)
                             embed.add_field(name="Session Duration", value=str(duration).split(".")[0], inline=True)
-                            embed.set_image(url="attachment://logo.png")
+                            embed.set_thumbnail(url="attachment://thumbnail.png")
                             embed.set_footer(text="Levant vACC Operations")
                             await channel.send(file=file, embed=embed)
 
@@ -90,24 +91,8 @@ class MyClient(discord.Client):
 
 client = MyClient(intents=intents)
 token = os.environ.get("DISCORD_TOKEN")
-keep_alive()
 client.run(token)
 
-from flask import Flask
-import threading
-
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Bot is alive!"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = threading.Thread(target=run)
-    t.start()
 
 
 
