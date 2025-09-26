@@ -2,7 +2,7 @@ import discord
 import asyncio
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask
 import threading
 
@@ -11,7 +11,15 @@ import threading
 # -----------------------------
 VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json"
 CHANNEL_ID = 1420399607661465673  # Replace with your channel ID
-WATCHED_POSITIONS = ["ORBI_TWR", "ORBI_GND", "ORBI_DEL", "ORBI_APP", "ORBI_DEP", "ORBB_N_CTR", "ORBB_CTR", "ORBB_1_CTR", "ORBB_2_CTR", "ORBB_S_CTR", "ORBB_U_CTR", "ORBB_V_CTR", "ORNI_GND", "ORNI_TWR", "ORMM_GND", "ORMM_TWR", "OREZ_TWR", "ORER_TWR", "ORKK_GND", "ORKK_TWR", "ORBM_TWR", "ORAA_TWR", "OSDI_DEL", "OSDI_GND", "OSDI_TWR", "OSDI_APP", "OSDI_DEP", "OSDI_CTR", "OSAP_GND", "OSAP_TWR", "OSAP_APP", "OLBA_DEL", "OLBA_GND", "OLBA_APP", "OLBA_CTR", "ORBI_FMP", "OLBA_FMP", "OLBA_TWR", "ORSU_TWR"]
+WATCHED_POSITIONS = [
+    "ORBI_TWR", "ORBI_GND", "ORBI_DEL", "ORBI_APP", "ORBI_DEP",
+    "ORBB_N_CTR", "ORBB_CTR", "ORBB_1_CTR", "ORBB_2_CTR", "ORBB_S_CTR",
+    "ORBB_U_CTR", "ORBB_V_CTR", "ORNI_GND", "ORNI_TWR", "ORMM_GND", "ORMM_TWR",
+    "OREZ_TWR", "ORER_TWR", "ORKK_GND", "ORKK_TWR", "ORBM_TWR", "ORAA_TWR",
+    "OSDI_DEL", "OSDI_GND", "OSDI_TWR", "OSDI_APP", "OSDI_DEP", "OSDI_CTR",
+    "OSAP_GND", "OSAP_TWR", "OSAP_APP", "OLBA_DEL", "OLBA_GND", "OLBA_APP",
+    "OLBA_CTR", "ORBI_FMP", "OLBA_FMP", "OLBA_TWR", "ORSU_TWR"
+]
 
 intents = discord.Intents.default()
 
@@ -57,8 +65,20 @@ class MyClient(discord.Client):
                         info = current_atc[callsign]
                         pilot_name = info.get("name", "Unknown")
                         freq = info.get("frequency", "N/A")
+                        logon_time_str = info.get("logon_time")
+
+                        # Calculate online time
+                        online_time = "Unknown"
+                        if logon_time_str:
+                            logon_time = datetime.fromisoformat(logon_time_str.replace("Z", "+00:00"))
+                            duration = datetime.now(timezone.utc) - logon_time
+                            total_seconds = int(duration.total_seconds())
+                            hours, remainder = divmod(total_seconds, 3600)
+                            minutes, seconds = divmod(remainder, 60)
+                            online_time = f"{hours}h {minutes}m {seconds}s"
+
                         file = discord.File("thumbnail.png", filename="thumbnail.png")
-                        timestamp = datetime.utcnow().strftime("%H:%M UTC")
+                        timestamp = datetime.utcnow().strftime("%H:%M:%S UTC")
 
                         embed = discord.Embed(
                             title=f"{callsign} is Online",
@@ -66,9 +86,11 @@ class MyClient(discord.Client):
                         )
                         embed.add_field(name="Callsign", value=callsign, inline=True)
                         embed.add_field(name="Frequency", value=freq, inline=True)
-                        embed.add_field(name="Controller",
-                                        value=f"{pilot_name} is online at {timestamp}",
-                                        inline=False)
+                        embed.add_field(
+                            name="Controller",
+                            value=f"{pilot_name} is online at {timestamp}\n**Session Length:** {online_time}",
+                            inline=False
+                        )
                         embed.set_thumbnail(url="attachment://thumbnail.png")
                         embed.set_footer(text="Levant vACC Operations")
 
@@ -80,16 +102,18 @@ class MyClient(discord.Client):
                     for callsign in previous_callsigns - current_callsigns:
                         info = self.previous_atc[callsign]
                         pilot_name = info.get("name", "Unknown")
-                        timestamp = datetime.utcnow().strftime("%H:%M UTC")
+                        timestamp = datetime.utcnow().strftime("%H:%M:%S UTC")
 
                         file = discord.File("thumbnail.png", filename="thumbnail.png")
                         embed = discord.Embed(
                             title=f"{callsign} Disconnected",
                             color=0xff0000
                         )
-                        embed.add_field(name="Controller",
-                                        value=f"{pilot_name} is now offline",
-                                        inline=False)
+                        embed.add_field(
+                            name="Controller",
+                            value=f"{pilot_name} is now offline",
+                            inline=False
+                        )
                         embed.add_field(name="End Time", value=timestamp, inline=True)
                         embed.set_thumbnail(url="attachment://thumbnail.png")
                         embed.set_footer(text="Levant vACC Operations")
@@ -98,7 +122,10 @@ class MyClient(discord.Client):
                     # -----------------------------
                     # Update previous_atc
                     # -----------------------------
-                    self.previous_atc = {callsign: current_atc[callsign] for callsign in current_callsigns}
+                    self.previous_atc = {
+                        callsign: current_atc[callsign]
+                        for callsign in current_callsigns
+                    }
 
             except Exception as e:
                 print(f"Error: {e}")
