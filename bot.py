@@ -10,7 +10,7 @@ import threading
 # Config
 # -----------------------------
 VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json"
-CHANNEL_ID = 1420399607661465673  # Replace with your channel ID
+CHANNEL_ID = 1421144864267173938  # Replace with your channel ID
 WATCHED_POSITIONS = [
     "ORBI_TWR", "ORBI_GND", "ORBI_DEL", "ORBI_APP", "ORBI_DEP",
     "ORBB_N_CTR", "ORBB_CTR", "ORBB_1_CTR", "ORBB_2_CTR", "ORBB_S_CTR",
