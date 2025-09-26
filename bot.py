@@ -67,7 +67,7 @@ class MyClient(discord.Client):
                         freq = info.get("frequency", "N/A")
                         logon_time_str = info.get("logon_time")
 
-                        # Calculate online time
+                        # Session time
                         online_time = "Unknown"
                         if logon_time_str:
                             logon_time = datetime.fromisoformat(logon_time_str.replace("Z", "+00:00"))
@@ -103,6 +103,17 @@ class MyClient(discord.Client):
                         info = self.previous_atc[callsign]
                         pilot_name = info.get("name", "Unknown")
                         timestamp = datetime.utcnow().strftime("%H:%M:%S UTC")
+                        logon_time_str = info.get("logon_time")
+
+                        # Session length
+                        online_time = "Unknown"
+                        if logon_time_str:
+                            logon_time = datetime.fromisoformat(logon_time_str.replace("Z", "+00:00"))
+                            duration = datetime.now(timezone.utc) - logon_time
+                            total_seconds = int(duration.total_seconds())
+                            hours, remainder = divmod(total_seconds, 3600)
+                            minutes, seconds = divmod(remainder, 60)
+                            online_time = f"{hours}h {minutes}m {seconds}s"
 
                         file = discord.File("thumbnail.png", filename="thumbnail.png")
                         embed = discord.Embed(
@@ -115,6 +126,7 @@ class MyClient(discord.Client):
                             inline=False
                         )
                         embed.add_field(name="End Time", value=timestamp, inline=True)
+                        embed.add_field(name="Session Duration", value=online_time, inline=True)
                         embed.set_thumbnail(url="attachment://thumbnail.png")
                         embed.set_footer(text="Levant vACC Operations")
                         await channel.send(file=file, embed=embed)
@@ -133,23 +145,25 @@ class MyClient(discord.Client):
             await asyncio.sleep(60)
 
 # -----------------------------
-# Flask Keep-Alive Server
+# Flask Web Server (keeps Render alive)
 # -----------------------------
-app = Flask("")
+app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Bot is running!"
+    return "✅ Levant vACC Bot is running!"
 
-def run_flask():
+def run_discord_bot():
+    token = os.environ.get("DISCORD_TOKEN")
+    client = MyClient(intents=intents)
+    client.run(token)
+
+# Run Discord bot in a background thread
+threading.Thread(target=run_discord_bot, daemon=True).start()
+
+# -----------------------------
+# Start Flask (main Render process)
+# -----------------------------
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
-
-threading.Thread(target=run_flask).start()
-
-# -----------------------------
-# Run Discord Bot
-# -----------------------------
-token = os.environ.get("DISCORD_TOKEN")
-client = MyClient(intents=intents)
-client.run(token)
