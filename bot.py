@@ -65,21 +65,9 @@ class MyClient(discord.Client):
                         info = current_atc[callsign]
                         pilot_name = info.get("name", "Unknown")
                         freq = info.get("frequency", "N/A")
-                        logon_time_str = info.get("logon_time")
-
-                        # Session time
-                        online_time = "Unknown"
-                        if logon_time_str:
-                            logon_time = datetime.fromisoformat(logon_time_str.replace("Z", "+00:00"))
-                            duration = datetime.now(timezone.utc) - logon_time
-                            total_seconds = int(duration.total_seconds())
-                            hours, remainder = divmod(total_seconds, 3600)
-                            minutes, seconds = divmod(remainder, 60)
-                            online_time = f"{hours}h {minutes}m {seconds}s"
-
-                        file = discord.File("thumbnail.png", filename="thumbnail.png")
                         timestamp = datetime.utcnow().strftime("%H:%M:%S UTC")
 
+                        file = discord.File("thumbnail.png", filename="thumbnail.png")
                         embed = discord.Embed(
                             title=f"{callsign} is Online",
                             color=0x00ff00
@@ -88,7 +76,7 @@ class MyClient(discord.Client):
                         embed.add_field(name="Frequency", value=freq, inline=True)
                         embed.add_field(
                             name="Controller",
-                            value=f"{pilot_name} is online at {timestamp}\n**Session Length:** {online_time}",
+                            value=f"{pilot_name} is online at {timestamp}",
                             inline=False
                         )
                         embed.set_thumbnail(url="attachment://thumbnail.png")
