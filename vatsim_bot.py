@@ -3,7 +3,7 @@ import requests
 import asyncio
 
 TOKEN = "MTQyMDQwMDc5MDAzMTU2ODg5Nw.GX_HQR.uNxxlU8ppYGqEhTd4-oqcqlrxtdy7-sGKZQjd4"
-CHANNEL_ID = 1420399607661465673  # Replace with your channel ID
+CHANNEL_ID = 1421144864267173938  # Replace with your channel ID
 CHECK_INTERVAL = 60
 WATCHED_POSITIONS = ["OLBA_APP", "OJAI_TWR", "LCLK_CTR"]
 
