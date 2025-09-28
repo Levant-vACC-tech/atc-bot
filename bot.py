@@ -18,7 +18,7 @@ WATCHED_POSITIONS = [
     "OREZ_TWR", "ORER_TWR", "ORKK_GND", "ORKK_TWR", "ORBM_TWR", "ORAA_TWR",
     "OSDI_DEL", "OSDI_GND", "OSDI_TWR", "OSDI_APP", "OSDI_DEP", "OSDI_CTR",
     "OSAP_GND", "OSAP_TWR", "OSAP_APP", "OLBA_DEL", "OLBA_GND", "OLBA_APP",
-    "OLBA_CTR", "ORBI_FMP", "OLBA_FMP", "OLBA_TWR", "ORSU_TWR"
+    "OLBA_CTR", "ORBI_FMP", "OLBA_FMP", "OLBA_TWR", "ORSU_TWR", "ORAA_GND"
 ]
 
 intents = discord.Intents.default()
